@@ -1,0 +1,123 @@
+{% extends 'user_authentication_folder/base.html' %}
+{% block title %}G_Minder | Mental Health{% endblock %}
+
+{% block content %}
+<style>
+    .checkin-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .checkin-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.6rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select,
+    textarea {
+        width: 100%;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    .submit-btn {
+        display: block;
+        width: 100%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        font-size: 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background-color: #0056b3;
+    }
+
+    @media (max-width: 600px) {
+        .checkin-container {
+            margin: 20px;
+            padding: 16px;
+        }
+
+        .checkin-container h2 {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+
+<div class="checkin-container">
+    <h2>🧠 Mental Health Check-In</h2>
+
+    <form method="POST" action="{% url 'mental-checkin' %}">
+        {% csrf_token %}
+
+        <label for="date" class="form-label">Date</label>
+        <input type="date" id="date" name="date" required>
+
+        <label for="mood" class="form-label">How are you feeling today?</label>
+        <select id="mood" name="mood" required>
+            <option value="">Select a mood</option>
+            <option value="happy">😊 Happy</option>
+            <option value="sad">😢 Sad</option>
+            <option value="angry">😠 Angry</option>
+            <option value="anxious">😰 Anxious</option>
+            <option value="tired">😴 Tired</option>
+            <option value="excited">😄 Excited</option>
+        </select>
+
+        <label for="mood_rating" class="form-label">Mood Rating (1 = Low, 10 = High)</label>
+        <input type="number" id="mood_rating" name="mood_rating" min="1" max="10" required>
+
+        <label for="thoughts" class="form-label">What are you thinking or feeling right now?</label>
+        <textarea id="thoughts" name="thoughts" rows="3" required></textarea>
+
+        <label for="reflection" class="form-label">What happened today that affected your mood?</label>
+        <textarea id="reflection" name="reflection" rows="2"></textarea>
+
+        <label for="gratitude" class="form-label">List 1–3 things you're grateful for today:</label>
+        <textarea id="gratitude" name="gratitude" rows="2"></textarea>
+
+        <label for="goal" class="form-label">What is one goal you have for tomorrow?</label>
+        <input type="text" id="goal" name="goal">
+
+        <label for="self_care" class="form-label">How will you take care of yourself?</label>
+        <textarea id="self_care" name="self_care" rows="2"></textarea>
+
+        <button type="submit" class="submit-btn">💾 Save Entry</button>
+    </form>
+</div>
+{% endblock %}

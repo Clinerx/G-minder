@@ -1,0 +1,675 @@
+{% extends 'user_authentication_folder/base.html' %} {% block title %}G_Minder |
+Progress{% endblock %} {% block content %}
+
+<div class="container">
+  <header style="background-color: #f0f0f0;background: linear-gradient(135deg,rgb(249, 177, 110),rgb(246, 147, 108)); vertical-align: middle; border-radius: 10px;">
+    <h1 class="page-title" style="text-align: center; color: #fff; ">To-Do List</h1>
+  </header>
+  
+
+  <section class="progress-section">
+    <h2 style="font-size: 24px; color: #525252;">Task Progress</h2>
+    <div class="progress-bars" style=" display: flex; flex-direction: column;">
+  
+      <div class="progress-item">
+        <h3 style="font-size: 15px;">Daily Progress: {{ daily_progress }}%</h3>
+        <div class="progress-bar">
+          <div class="progress-fill daily" style="width: {{ daily_progress }}%"></div>
+        </div>
+      </div>
+  
+      <div class="progress-item">
+        <h3 style="font-size: 15px;">Weekly Progress: {{ week_progress }}%</h3>
+        <div class="progress-bar">
+          <div class="progress-fill weekly" style="width: {{ week_progress }}%"></div>
+        </div>
+      </div>
+  
+      <div class="progress-item">
+        <h3 style="font-size: 15px;">Monthly Progress: {{ month_progress }}%</h3>
+        <div class="progress-bar">
+          <div class="progress-fill monthly" style="width: {{ month_progress }}%"></div>
+        </div>
+      </div>
+  
+    </div>
+  </section>
+  
+  
+  
+  <section class="task-section" style="padding: 0;">
+    
+    <div class="task-list" style="
+      background-color:rgb(255, 255, 255); /* Light warm color */
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.27);
+      padding: 2rem;
+      margin: 2rem auto;
+      max-width: 100%;
+      
+
+    ">
+    <div style="display: flex; justify-content: center; margin-top: 5px;">
+      <button class="open-modal-btn" onclick="openModal()" style="
+        padding: 12px 24px;
+        background-color: #3f51b5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      " onmouseover="this.style.backgroundColor='#0056b3'" onmouseout="this.style.backgroundColor='#007bff'">
+        Add New Task
+      </button>
+    </div>
+    
+      <h2 style="background-color:rgb(25, 168, 183); color: #fff; border-radius: 5px; padding: 3px;">Ongoing Tasks</h2>
+      <ul>
+        {% for task in ongoing_tasks %}
+          <li class="task-item">
+            <div class="task-card" style="border: 1px solid #afadef; display: flex; flex-direction: column; margin-bottom: 10px; padding: 10px; border-radius: 10px; box-shadow: 1px 5px 3px  #afadef;">
+              <div class="taskPost">
+                <div class="taskName" style="font-weight: bold; text-transform: uppercase;">
+                  {{ task.name }}
+                </div>
+                <div class="taskDue">
+                  Due: {{ task.due_date}}
+                </div>
+              </div>
+      
+              <!-- Action buttons -->
+              <div class="task-actions" style="margin-top: 10px;">
+                <form action="{% url 'complete_task' task.id %}" method="post" style="display: inline">
+                  {% csrf_token %}
+                  <button type="button" style="background-color: rgb(45, 173, 87); color: white;" title="Mark as Complete" onclick="openConfirmModal('complete', {{ task.id }})">
+                    <i class="fas fa-check"></i>
+                  </button>
+                </form>
+      
+                <!-- Edit task (open modal) -->
+                <button style="background-color: rgb(45, 145, 173); color: white;" onclick="openModal('modal-{{ task.id }}')" title="Edit Task">
+                  <i class="fas fa-pen"></i>
+                </button>
+      
+                <!-- Delete task -->
+                <form action="{% url 'delete_task' task.id %}" method="post" style="display: inline;">
+                  {% csrf_token %}
+                  <button type="button" style="background-color: rgb(219, 46, 49); color: white;" title="Delete Task" onclick="openConfirmModal('delete', {{ task.id }})">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+              </div>
+      
+              <!-- Modal -->
+              <div id="modal-{{ task.id }}" class="modal">
+                <div class="modal-content">
+                  <span class="close" onclick="closeModal('modal-{{ task.id }}')">&times;</span>
+                  <h2 style="background-color: rgb(25, 168, 183); color: #fff; border-radius: 5px; padding: 3px;">Edit Task</h2>
+                  <form action="{% url 'add_or_update_task' task.id %}" method="post">
+                    {% csrf_token %}
+                      <div class="form-group">
+                        <label for="{{ form.due_date.id_for_label }}">Due Date</label>
+                        {{ form.due_date }}
+                      </div>
+
+                      <div class="form-group">
+                        <label for="{{ form.time.id_for_label }}"
+                          >Due Time (e.g. 1:00 AM)</label
+                        >
+                        {{ form.time }}
+                      </div>
+
+                      <div class="form-group">
+                        <label for="{{ form.name.id_for_label }}">Task Name</label>
+                        {{ form.name }}
+                      </div>
+
+                      <div class="form-group">
+                        <label for="{{ form.description.id_for_label }}">Description</label>
+                        {{ form.description }}
+                      </div>
+
+                      <div class="form-group">
+                        <label for="{{ form.completed.id_for_label }}">Completed?</label>
+                        {{ form.completed }}
+                      </div>
+
+                      <!-- Status Dropdown -->
+                      <div class="form-group">
+                        <label for="{{ form.status.id_for_label }}">Status</label>
+                        {{ form.status }}
+                      </div>
+                    <button type="submit">Save Changes</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </li>
+        {% empty %}
+          <li>No ongoing tasks</li>
+        {% endfor %}
+      </ul>
+      
+
+      <h2 style="background-color:rgb(24, 181, 95); color: #fff; border-radius: 5px; padding: 3px;">Completed Tasks</h2>
+
+      <ul>
+          {% for task in completed_tasks %}
+              <li class="task-item completed">
+                  <div class="task-card" style="border: 1px solid #afadef; display: flex; flex-direction: column; margin-bottom: 10px; padding: 10px; border-radius: 10px; box-shadow: 1px 5px 3px  #afadef; ">
+                      <div class="task-content">
+                          <h4 style="font-weight: bold; text-transform: uppercase;">{{ task.name }}</h4>
+                          <p>Due: {{ task.due_date }}</p>
+                      </div>
+                      <div class="task-actions">
+                          <form action="{% url 'delete_task' task.id %}" method="post">
+                              {% csrf_token %}
+                              <button type="submit" class="task-action delete" title="Delete Task" style="background-color:rgb(219, 46, 49);">
+                                  <i class="fas fa-trash"></i>
+                              </button>
+                          </form>
+                      </div>
+                  </div>
+              </li>
+          {% empty %}
+              <li>No tasks completed yet.</li>
+          {% endfor %}
+      </ul>
+      
+      <!-- Pagination controls -->
+      {% if completed_tasks.has_other_pages %}
+      <div id="pagination-anchor" class="pagination" style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+      ">
+        {% if completed_tasks.has_previous %}
+          <a href="?page={{ completed_tasks.previous_page_number }}#pagination-anchor" style="
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            background-color: #fff;
+            transition: background-color 0.3s ease;
+          " onmouseover="this.style.backgroundColor='#e9ecef'" onmouseout="this.style.backgroundColor='#fff'">
+            &laquo; Previous
+          </a>
+        {% endif %}
+    
+        {% for page_num in completed_tasks.paginator.page_range %}
+          {% if page_num == completed_tasks.number %}
+            <span style="
+              padding: 8px 12px;
+              background-color: #3f51b5;
+              color: #fff;
+              border-radius: 5px;
+              font-weight: bold;
+            ">{{ page_num }}</span>
+          {% else %}
+            <a href="?page={{ page_num }}#pagination-anchor" style="
+              padding: 8px 12px;
+              border: 1px solid #ddd;
+              border-radius: 5px;
+              text-decoration: none;
+              color: #333;
+              background-color: #fff;
+              transition: background-color 0.3s ease;
+            " onmouseover="this.style.backgroundColor='#e9ecef'" onmouseout="this.style.backgroundColor='#fff'">
+              {{ page_num }}
+            </a>
+          {% endif %}
+        {% endfor %}
+    
+        {% if completed_tasks.has_next %}
+          <a href="?page={{ completed_tasks.next_page_number }}#pagination-anchor" style="
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            background-color: #fff;
+            transition: background-color 0.3s ease;
+          " onmouseover="this.style.backgroundColor='#e9ecef'" onmouseout="this.style.backgroundColor='#fff'">
+            Next &raquo;
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+    
+      
+    <h2 style="background-color:rgb(224, 42, 60); color: #fff; border-radius: 5px; padding: 3px;">Failed Tasks</h2>
+<ul>
+  {% for task in failed_tasks %}
+  <li class="task-item failed">
+    <div class="task-card" style="border: 1px solid #f5c6cb; background-color: #f8d7da; padding: 10px; border-radius: 10px; box-shadow: 1px 5px 3px #f5c6cb;">
+      <div class="task-content">
+        <h4 style="font-weight: bold; text-transform: uppercase;">{{ task.name }}</h4>
+        <p>
+          Due: {{ task.due_date }} <strong style="color: red;">(Failed - Overdue)</strong>
+        </p>
+      </div>
+      <div class="task-actions">
+        <form action="{% url 'complete_task' task.id %}" method="post" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" title="Mark as Completed" style="background-color: rgb(45, 173, 87); color: white;"><i class="fas fa-check"></i></button>
+        </form>
+
+        <form action="{% url 'delete_task' task.id %}" method="post" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" onclick="return confirm('Are you sure you want to delete this task?');" title="Delete Task" style="background-color:rgb(219, 46, 49);">
+            <i class="fas fa-trash"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </li>
+  {% empty %}
+  <li>No failed tasks.</li>
+  {% endfor %}
+</ul>
+    </div>
+  </section>
+
+
+  <!-- Modal -->
+  <div id="task-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+
+      <h2>{% if task_id %}Update Task{% else %}Add New Task{% endif %}</h2>
+      <form
+        method="POST"
+        class="task-form"
+        action="{% url 'add_or_update_task' %}"
+      >
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="{{ form.due_date.id_for_label }}">Due Date</label>
+          {{ form.due_date }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.time.id_for_label }}"
+            >Due Time (e.g. 1:00 AM)</label
+          >
+          {{ form.time }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.name.id_for_label }}">Task Name</label>
+          {{ form.name }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.description.id_for_label }}">Description</label>
+          {{ form.description }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.completed.id_for_label }}">Completed?</label>
+          {{ form.completed }}
+        </div>
+
+        <!-- Status Dropdown -->
+        <div class="form-group">
+          <label for="{{ form.status.id_for_label }}">Status</label>
+          {{ form.status }}
+        </div>
+
+        <button type="submit" class="submit-btn">Save</button>
+
+        {% if form.errors %}
+        <div class="error-box">
+          <strong>Please fix the following errors:</strong>
+          <ul>
+            {% for field in form %} {% for error in field.errors %}
+            <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %} {% endfor %} {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+<div id="confirmation-modal" class="modal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index:1000;">
+  <div class="modal-content" style="background:white; margin: 15% auto; padding: 20px; border-radius:10px; width: 300px; text-align:center;">
+    <h3 id="modal-title">Confirm Action</h3>
+    <p id="modal-message">Are you sure you want to proceed?</p>
+
+    <form id="confirmation-form" method="post" style="margin-top:15px;">
+      {% csrf_token %}
+      <button type="submit" style="background-color:green; color:white; padding:5px 10px; border:none; border-radius:5px;">Yes</button>
+      <button type="button" onclick="closeConfirmModal()" style="background-color:grey; color:white; padding:5px 10px; border:none; border-radius:5px;">Cancel</button>
+    </form>
+  </div>
+</div>
+
+
+  <!-- Modal Styles and Script -->
+  <style>
+    :root {
+      --blue: #3498db;
+      --orange: #f39c12;
+      --green: #2ecc71;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --danger-bg: #fee2e2;
+      --danger-border: #f87171;
+      --danger-text: #b91c1c;
+    }
+    /* ========== TASKS ========== */
+    .task-list ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    
+  
+    /* ========== PROGRESS BARS ========== */
+    .progress-section {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+    
+    .progress-section h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+    
+    .progress-item h3 {
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+    
+    .progress-bar {
+      height: 20px;
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 50px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 50px;
+      transition: width 0.6s ease-in-out;
+    }
+    
+    .progress-fill.daily {
+      background: linear-gradient(90deg, #4caf50, #81c784); /* Green shades */
+    }
+    
+    .progress-fill.weekly {
+      background: linear-gradient(90deg, #2196f3, #64b5f6); /* Blue shades */
+    }
+    
+    .progress-fill.monthly {
+      background: linear-gradient(90deg, #ff9800, #ffcc80); /* Orange shades */
+    }
+    
+    .progress-bar {
+      background-color: #e0e0e0;
+      border-radius: 20px;
+      height: 20px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+  
+    .progress-fill {
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.4s ease;
+    }
+  
+    .progress-fill.daily { background-color: var(--blue); }
+    .progress-fill.weekly { background-color: var(--orange); }
+    .progress-fill.monthly { background-color: var(--green); }
+  
+    /* ========== MODAL ========== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      overflow: auto;
+    }
+    
+    .modal.show {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .modal-content {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      position: relative;
+      margin: auto; /* helps center when inside flex container */
+    }
+      
+  
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  
+    /* ========== BUTTON ========== */
+    .submit-btn {
+      background-color: var(--primary);
+      color: #fff;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+  
+    .submit-btn:hover {
+      background-color: var(--primary-hover);
+    }
+  
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      color: #333;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+  
+    /* ========== TYPOGRAPHY ========== */
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: #333;
+    }
+  
+    h3 {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+    }
+  
+    /* ========== FORM ========== */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+  
+    label {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+  
+    input, textarea, select {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+  
+    textarea {
+      resize: vertical;
+      height: 150px;
+    }
+  
+    .error-box {
+      background-color: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      color: var(--danger-text);
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1.5rem;
+    }
+  
+    /* ========== CONTAINER LAYOUT ========== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+  
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+  
+    .progress-bars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+  
+    .progress-text {
+      font-size: 1.2rem;
+    }
+  
+    .task-list {
+      margin-top: 2rem;
+    }
+  
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .container { padding: 1rem; }
+      .page-title { font-size: 1.5rem; }
+      .progress-text { font-size: 1rem; }
+  
+      h2, h3 { font-size: 1.3rem; }
+  
+      input, textarea, select {
+        padding: 0.6rem;
+        font-size: 0.95rem;
+      }
+  
+      .form-group { margin-bottom: 1rem; }
+      .submit-btn {
+        font-size: 0.95rem;
+        padding: 0.6rem 1rem;
+      }
+  
+      .modal-content { padding: 1rem; width: 90%; }
+      .close-btn { font-size: 1.2rem; }
+    }
+  </style>
+  <script>
+    // Function to open the Add Task modal
+    function openModal(modalId = 'task-modal') {
+      document.getElementById(modalId).style.display = 'block';
+    }
+  
+    // Function to close a modal by ID
+    function closeModal(modalId = 'task-modal') {
+      document.getElementById(modalId).style.display = 'none';
+    }
+  
+    // Close modal when clicking outside the modal content
+    window.onclick = function (event) {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach((modal) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    };
+
+        // Smooth scroll to the pagination anchor if hash is present
+    window.addEventListener('load', function () {
+      if (window.location.hash === '#pagination-anchor') {
+        const anchor = document.getElementById('pagination-anchor');
+        if (anchor) {
+          anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+
+
+    function openConfirmModal(actionType, taskId) {
+      const modal = document.getElementById('confirmation-modal');
+      const title = document.getElementById('modal-title');
+      const message = document.getElementById('modal-message');
+      const form = document.getElementById('confirmation-form');
+  
+      if (actionType === 'complete') {
+        title.innerText = 'Confirm Completion';
+        message.innerText = 'Are you sure you want to mark this task as complete?';
+        form.action = `/complete_task/${taskId}/`;
+      } else if (actionType === 'delete') {
+        title.innerText = 'Confirm Deletion';
+        message.innerText = 'Are you sure you want to delete this task?';
+        form.action = `/delete_task/${taskId}/`;
+      }
+  
+      modal.style.display = 'block';
+    }
+  
+    function closeConfirmModal() {
+      document.getElementById('confirmation-modal').style.display = 'none';
+    }
+  
+    // Optional: Close modal when clicking outside it
+    window.onclick = function(event) {
+      const modal = document.getElementById('confirmation-modal');
+      if (event.target === modal) {
+        closeConfirmModal();
+      }
+    }
+  </script>
+  
+  {% endblock %}
+

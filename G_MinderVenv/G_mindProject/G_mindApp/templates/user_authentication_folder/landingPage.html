@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>G-Minder | Your AI-Powered Scheduler</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #f4f7fc, #e6ecf5);
+      color: #333;
+    }
+    .section {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #ffad60, #ff7f50);
+      color: white;
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+      position: relative;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+    }
+    header {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      width: 80px;
+      height: 80px;
+      z-index: 1;
+      backdrop-filter: blur(5px);
+      animation: floatBubble 15s ease-in-out infinite alternate;
+    }
+  
+    /* Different bubble sizes/positions */
+    .bubble:nth-child(1) {
+      top: 20px;
+      left: 30px;
+      width: 60px;
+      height: 60px;
+      animation-delay: 0s;
+    }
+  
+    .bubble:nth-child(2) {
+      top: 100px;
+      right: 50px;
+      width: 100px;
+      height: 100px;
+      animation-delay: 3s;
+    }
+  
+    .bubble:nth-child(3) {
+      bottom: 20px;
+      left: 50px;
+      width: 70px;
+      height: 70px;
+      animation-delay: 6s;
+    }
+  
+    .bubble:nth-child(4) {
+      bottom: 100px;
+      right: 80px;
+      width: 90px;
+      height: 90px;
+      animation-delay: 1.5s;
+    }
+  
+    .bubble:nth-child(5) {
+      top: 50%;
+      left: 45%;
+      width: 50px;
+      height: 50px;
+      transform: translate(-50%, -50%);
+      animation-delay: 4.5s;
+    }
+  
+    /* Floating Animation Keyframes */
+    @keyframes floatBubble {
+      0% {
+        transform: translateY(0) translateX(0);
+      }
+      50% {
+        transform: translateY(-20px) translateX(10px);
+      }
+      100% {
+        transform: translateY(0) translateX(0);
+      }
+    }
+  
+    /* Make real header content above bubbles */
+    header h1,
+    header p,
+    .login-btn,
+    .cta-button {
+      position: relative;
+      z-index: 2;
+    }
+    .login-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 0.8rem 1.5rem;
+      background: #ffffff;
+      color:rgb(255, 120, 16);
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 600;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .login-btn:hover {
+      background: #f1f1f1;
+      transform: translateY(-2px);
+    }
+    header h1 {
+      font-size: 2.5rem;
+      margin-top: 2rem;
+    }
+    header p {
+      font-size: 1.2rem;
+      margin: 1rem 0 2rem;
+      opacity: 0.95;
+    }
+    .cta-button {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      background: #ffffff;
+      color:rgb(255, 120, 16);
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .cta-button:hover {
+      background: #f1f1f1;
+      transform: translateY(-2px);
+    }
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      padding: 4rem 2rem;
+      background: #fff;
+    }
+    .feature {
+      background: #f9f9f9;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .feature:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 114, 255, 0.15);
+    }
+    .feature h3 {
+      font-size: 1.5rem;
+      color:rgb(255, 120, 16);
+      margin-bottom: 1rem;
+    }
+    .feature p {
+      font-size: 1rem;
+      color: #555;
+    }
+    footer {
+      margin-top: auto;
+      background: linear-gradient(135deg, #ffad60, #ff7f50);";
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.95rem;
+      border-top-left-radius: 30px;
+      border-top-right-radius: 30px;
+    }
+    footer a {
+      color: white;
+      margin: 0 1rem;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+    /* Modal Style */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      animation: fadeIn 0.3s;
+    }
+    .modal-content {
+      background: #fff;
+      margin: 15% auto;
+      padding: 2rem;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      animation: slideIn 0.3s;
+    }
+    .modal-content h2 {
+      color:rgb(255, 120, 16);
+      margin-bottom: 1.5rem;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 1rem;
+      margin: 0.8rem 0;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+    .modal-content button {
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1rem;
+      background:rgb(255, 128, 0);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: background 0.3s;
+    }
+    .modal-content button:hover {
+      background: #005fcc;
+    }
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 25px;
+      font-size: 30px;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: black;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 2rem;
+      }
+      header p {
+        font-size: 1rem;
+      }
+      .modal-content {
+        margin: 30% auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="section">
+    <header>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+    
+      <button class="login-btn" onclick="document.getElementById('loginModal').style.display='block'">Login</button>
+      <h1>Welcome to G-Minder</h1>
+      <p>Your AI-powered scheduler to organize activities and improve well-being</p>
+      <button class="cta-button" onclick="openRegistrationModal()" >Get Started</button>
+    </header>
+    
+
+    <section class="features">
+      <div class="feature">
+        <h3>Smart Time Management</h3>
+        <p>AI-driven daily planning for better productivity.</p>
+      </div>
+      <div class="feature">
+        <h3>Progress Tracking</h3>
+        <p>Visual progress updates and personal motivation tips.</p>
+      </div>
+      <div class="feature">
+        <h3>Mental Health Support</h3>
+        <p>Mindfulness tools and stress-relieving exercises.</p>
+      </div>
+    </section>
+
+    <footer>
+      
+    </footer>
+  </section>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
+      <h2>Login</h2>
+      <form action="{% url 'login' %}" method="POST">
+        {% csrf_token %}
+        <input type="email" name="username" placeholder="Email or Username" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+        {% if messages %}
+          <div class="error-msg">
+            {% for message in messages %}
+              <p style="color: red;">{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <!-- Registration Modal -->
+  <div id="registrationModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeRegistrationModal()">&times;</span>
+      <h2>Register</h2>
+      <form action="{% url 'register' %}" method="POST">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password1" placeholder="Password" required>
+        <input type="password" name="password2" placeholder="Confirm Password" required>
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  </div>
+
+
+
+
+  <script>
+    // Close modal if user clicks outside
+    window.onclick = function (event) {
+      const modal = document.getElementById('loginModal');
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    function openRegistrationModal() {
+        document.getElementById('registrationModal').style.display = 'block';
+      }
+    
+      function closeRegistrationModal() {
+        document.getElementById('registrationModal').style.display = 'none';
+      }
+    
+      // Optional: Close the modal when clicking outside of it
+      window.onclick = function(event) {
+        const modal = document.getElementById('registrationModal');
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      }
+
+      document.querySelector("#registrationModal form").addEventListener("submit", function (e) {
+        e.preventDefault();
+    
+        fetch("{% url 'register' %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams(new FormData(this)),
+        })
+        .then(response => response.text())
+        .then(html => {
+          document.body.innerHTML = html;  // Replaces page with response (adjust this to only update part of the DOM)
+        });
+      });
+
+      {% if messages %}
+      document.getElementById('loginModal').style.display = 'block';
+      {% endif %}
+  </script>
+</body>
+</html>

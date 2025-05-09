@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}G_Minder | Dashboard{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f7f9fb;
+      color: #333;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, #ffad60, #ff7f50);
+      padding: 1rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar .logo {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .burger {
+      display: block;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      height: 100%;
+      width: 250px;
+      background: linear-gradient(135deg, #ffad60, #ff7f50);
+      padding: 2rem 1rem;
+      transition: 0.3s ease;
+      z-index: 1001;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      margin: 1.2rem 0;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar ul li i {
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+
+    .sidebar.open {
+      left: 0;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      display: none;
+    }
+
+    .overlay.show {
+      display: block;
+    }
+
+    section {
+      padding: 1rem;
+    }
+
+    .quoteContainer {
+      background-color: #e0e7ff;
+      padding: 1rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      margin: 0.4rem 0.2rem;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      background-color: #3f51b5;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+      button {
+        background-color: #3f51b5;
+        color: #fff;
+        padding: 0.5rem 1.2rem;
+        border-radius: 5px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      
+      button:hover {
+        background-color: #303f9f;
+      }
+      
+      .progressTrackerContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem;
+      }
+      
+      .progressTrackerContainer > div {
+        background-color: #fff;
+        padding: 1.2rem;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #3f51b5;
+        box-shadow: 0 3px 6px rgba(63, 81, 181, 0.1);
+      }
+      
+      @media (min-width: 768px) {
+        .progressTrackerContainer {
+          flex-direction: row;
+        }
+      
+        .progressTrackerContainer > div {
+          flex: 1;
+          text-align: center;
+        }
+      }
+      
+
+    .daily, .weekly, .graphs {
+      background-color: #f0f2ff;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .burger {
+        display: none;
+      }
+
+      .sidebar {
+        left: 0;
+        position: static;
+        width: auto;
+        background: none;
+        padding: 0;
+      }
+
+      .sidebar ul {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+      }
+
+      .overlay {
+        display: none !important;
+      }
+    }
+    .sidebar h1{
+        color: white;
+    }
+    .bottom-settings {
+        position: absolute;
+        bottom: 1rem;
+        left: 1rem;
+        right: 1rem;
+      }
+      
+      .profile-section {
+        display: flex;
+        margin-bottom: 10px;
+        align-items: center;
+        margin-bottom: 0.8rem;
+        color: white;
+      }
+      
+      .profile-section .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin-right: 10px;
+        border: 2px solid white;
+        object-fit: cover;
+      }
+      
+      .profile-section .username {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      
+      .bottom-settings hr {
+        border: none;
+        border-radius: 10px;
+        border-top: 4px solid rgba(255, 255, 255, 0.3);
+        margin-bottom: 0.8rem;
+      }
+      
+      .bottom-settings li {
+        list-style: none;
+        color: white;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+      }
+      
+      .bottom-settings li i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+      }
+
+      .graphs {
+        background-color: #f0f2ff;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+      }
+      
+      .progress-bar-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      
+      .progress-block label {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+        display: block;
+      }
+      
+      .progress-bar {
+        background-color: #d6d6d6;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 25px;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        border-radius: 10px;
+        position: relative;
+        color: white;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 10px;
+        transition: width 0.4s ease;
+      }
+      
+      .progress-fill span {
+        font-size: 0.8rem;
+      }
+      
+      .progress-summary {
+        font-size: 0.85rem;
+        color: #555;
+        margin-top: 4px;
+      }
+      .sidebar ul li a{
+        text-decoration: none;
+        color: white;
+      }
+      /* The Modal (background) */
+      .logout-modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 2000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+        padding-top: 60px;
+      }
+    
+      /* Modal Content */
+      .logout-modal-content {
+        border-radius: 10px;
+        background-color: #fefefe;
+        margin: 2% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 500px;
+        text-align: center;
+      }
+    
+  /* Modal Title */
+  .logout-modal-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  /* Close Button */
+  .logout-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #aaa;
+    font-size: 30px;
+    cursor: pointer;
+  }
+
+  .logout-close-btn:hover {
+    color: #333;
+  }
+
+  /* Modal Actions Buttons */
+  .logout-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .logout-modal-actions button {
+    background: linear-gradient(135deg, #ffad60, #ff7f50);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .logout-modal-actions button:hover {
+    background-color: #0056b3;
+  }
+
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="logo">G_Minder</div>
+    <div class="burger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <ul>
+      <h1>G_Minder</h1>
+      <li><i class="fas fa-home"></i><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
+      <li><i class="fas fa-chart-line"></i><a href="{% url 'progressPage' %}">Progress</a></li>
+      <li><i class="fas fa-heartbeat"></i><a href="{% url 'mental-checkin' %}">Mental</a></li>
+
+    </ul>
+    <div class="bottom-settings">
+      <hr />
+      <div class="profile-section">
+
+        <span class="username"></span>
+      </div>
+      <li>
+        <a href="javascript:void(0);" onclick="openLogoutModal()" style="text-decoration: none; color: #fff;">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+        
+      </li>
+
+    </div>
+  </div>
+ <!-- Logout Modal -->
+<div id="logout-modal-container" class="logout-modal">
+  <div class="logout-modal-content">
+    <span class="logout-close-btn" onclick="closeLogoutModal()">&times;</span>
+    <h2 style="font-size: 15px;">Are you sure you want to log out?</h2>
+    <div class="logout-modal-actions">
+      <button onclick="logoutUser()" style="font-size: 15px;">Confirm</button>
+      <button onclick="closeLogoutModal()" style="font-size: 15px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Page content -->
+  <main>
+    {% block content %}
+    <!-- Page-specific content will go here -->
+    {% endblock %}
+  </main>
+  
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('show');
+    }
+     // JavaScript to create random bubbles inside the container
+  // JavaScript to create random bubbles inside the container
+  const bubbleContainer = document.querySelector('.bubbles');
+  const numBubbles = 5;  // Set number of bubbles to create
+
+  for (let i = 0; i < numBubbles; i++) {
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+
+    // Randomize bubble's position within the container
+    const randomX = Math.random() * 100; // Random x position from 0 to 100%
+    const randomY = Math.random() * 100; // Random y position from 0 to 100%
+    const randomDelay = Math.random() * 5; // Random animation delay from 0 to 5 seconds
+    const randomDuration = 5 + Math.random() * 5; // Random animation duration between 5 to 10 seconds
+
+    bubble.style.left = `${randomX}%`;
+    bubble.style.bottom = `${randomY}%`;
+    bubble.style.animationDelay = `-${randomDelay}s`;
+    bubble.style.animationDuration = `${randomDuration}s`;
+
+    bubbleContainer.appendChild(bubble);
+  }
+    // Open the logout modal
+  function openLogoutModal() {
+    document.getElementById('logout-modal-container').style.display = 'block';
+  }
+
+  // Close the logout modal
+  function closeLogoutModal() {
+    document.getElementById('logout-modal-container').style.display = 'none';
+  }
+
+  // Logout the user (triggering Django logout)
+  function logoutUser() {
+    window.location.href = "{% url 'logout' %}";  // Redirect to the logout view
+  }
+  </script>
+    <!-- Bootstrap Bundle JS (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

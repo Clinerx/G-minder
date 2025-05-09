@@ -1,0 +1,505 @@
+<style>
+  .progress-button-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    background-color: #3498db; /* Blue button color */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .btn:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+    cursor: pointer;
+  }
+  
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #f0a500; /* Warm accent border */
+    transition: all 0.3s ease;
+  }
+  
+  .card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+  }
+  
+  .card p {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .card .status {
+    font-size: 1.25rem;
+    margin-left: 10px;
+  }
+  
+  .status.completed {
+    color: #28a745; /* Green for completed */
+  }
+  
+  .status.in-progress {
+    color: #f39c12; /* Yellow for in-progress */
+  }
+  
+  .status.failed {
+    color: #e74c3c; /* Red for failed */
+  }
+  
+  .status.pending {
+    color: #3498db; /* Blue for pending */
+  }
+  
+  .daily-focus {
+    background: linear-gradient(135deg, #ffad60, #ff7f50); /* Warm gradient background */
+    color: #fff; /* Text color matches the warm gradient */
+  }
+  
+  .tasks {
+    background-color: #fff3e0; /* Light warm color */
+  }
+  
+  .progress-overview {
+    background-color: #fff9db; /* Light yellow */
+  }
+  
+  ul.task-list {
+    list-style-type: none; /* Removes bullets */
+    padding-left: 0; /* Removes left padding */
+  }
+  
+  .task-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; /* Adds space between tasks */
+    padding: 10px;
+    background-color: #f8f9fa; /* Light background for tasks */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .task-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .status-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  
+  .status-text {
+    font-size: 0.875rem;
+    margin-right: 10px;
+    color: #666;
+  }
+  
+  .status {
+    font-size: 1.25rem;
+  }
+  
+  .status.completed {
+    color: #28a745; /* Green for completed */
+  }
+  
+  .status.in-progress {
+    color: #f39c12; /* Yellow for in-progress */
+  }
+  
+  .status.failed {
+    color: #e74c3c; /* Red for failed */
+  }
+  
+  .status.pending {
+    color: #3498db; /* Blue for pending */
+  }
+  
+  @media (min-width: 600px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .card {
+      padding: 20px;
+    }
+  }
+  
+  @media (min-width: 900px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+  .chat-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+  }
+
+  .chat-toggle button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 16px;
+    font-size: 24px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+
+  .chat-box {
+    position: fixed;
+    bottom: -400px;
+    right: 20px;
+    width: 90%;
+    max-width: 360px;
+    height: 400px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    transition: bottom 0.3s ease-in-out;
+    overflow: hidden;
+    z-index: 1000;
+  }
+
+  .chat-header {
+    background-color: #6C63FF;
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    text-align: center;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    max-height: 260px; /* controls scrollable height */
+    font-size: 14px;
+  }
+
+  .chat-messages .user-message,
+  .chat-messages .bot-message {
+    margin: 5px 0;
+    padding: 8px 12px;
+    border-radius: 10px;
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+
+  .chat-messages .user-message {
+    background-color: #e6f7ff;
+    align-self: flex-end;
+    margin-left: auto;
+  }
+
+  .chat-messages .bot-message {
+    background-color: #f0f0f0;
+    align-self: flex-start;
+    margin-right: auto;
+  }
+
+  .chat-input-container {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+  }
+
+  .chat-input-container input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    outline: none;
+  }
+
+  .chat-input-container button {
+    margin-left: 8px;
+    padding: 8px 12px;
+    background-color: #6C63FF;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .chat-toggle button {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background-color: #6C63FF;
+    color: white;
+    font-size: 20px;
+    border: none;
+    border-radius: 50%;
+    padding: 15px;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  .chat-header {
+    background: #1976d2;
+    color: white;
+    padding: 14px;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    font-size: 14px;
+  }
+
+  .user-message, .bot-message {
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    max-width: 80%;
+    line-height: 1.4;
+  }
+
+  .user-message {
+    background: #e3f2fd;
+    align-self: flex-end;
+    margin-left: auto;
+  }
+
+  .bot-message {
+    background: #f1f1f1;
+    align-self: flex-start;
+    margin-right: auto;
+  }
+
+  .chat-input-container {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+  }
+
+  .chat-input-container input {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
+
+  .chat-input-container button {
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 16px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  #stop-response {
+    margin-left: 6px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  /* Overall container styles */
+  .welcomeContainer {
+    background: linear-gradient(145deg,rgb(132, 239, 233),rgb(26, 76, 177)); /* Warm blue gradient for a peaceful atmosphere */
+    padding: 60px;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .welcomeContainer h1 {
+    font-size: 2.8rem;
+    color: #fff; /* White text for contrast */
+    margin-bottom: 20px;
+    font-weight: 700;
+    animation: fadeInUp 1s ease-out;
+  }
+  
+  .welcomeContainer h2 {
+    font-size: 1.6rem;
+    color: #f0f8ff; /* A soft light blue for the date */
+    margin-bottom: 25px;
+    font-weight: 500;
+    animation: fadeInUp 1.5s ease-out;
+  }
+  
+  #user-name {
+    color: #FFD700;  /* Gold color to highlight the username */
+  }
+  
+  .quoteContainer {
+    background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+    padding: 20px 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    font-size: 1.25rem;
+    font-style: italic;
+    color: #f0f8ff; /* Light blue color for the quote */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    animation: fadeInUp 2s ease-out;
+  }
+  
+  .decorative-bubbles {
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    right: 0;
+    z-index: 0;
+  }
+  
+  .bubble {
+    position: absolute;
+    bottom: 0;
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.6);  /* Light white bubbles for a dreamy effect */
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: floatBubble 8s ease-in-out infinite;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .bubble:nth-child(1) {
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 6s;
+  }
+  
+  .bubble:nth-child(2) {
+    left: 30%;
+    animation-delay: 2s;
+    animation-duration: 8s;
+  }
+  
+  .bubble:nth-child(3) {
+    left: 60%;
+    animation-delay: 4s;
+    animation-duration: 7s;
+  }
+  
+  /* Bubble animation */
+  @keyframes floatBubble {
+    0% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translateY(-150px);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+  }
+  
+  /* FadeInUp Animation */
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .welcomeContainer {
+      padding: 40px; /* Reduced padding for smaller screens */
+    }
+  
+    .welcomeContainer h1 {
+      font-size: 2rem; /* Smaller font size for smaller devices */
+    }
+  
+    .welcomeContainer h2 {
+      font-size: 1.4rem; /* Adjusted font size for readability */
+    }
+  
+    .quoteContainer {
+      padding: 15px 20px; /* Slightly smaller padding */
+      font-size: 1.1rem; /* Reduced font size */
+    }
+  
+    .bubble {
+      width: 60px;
+      height: 60px; /* Smaller bubbles for mobile */
+    }
+  
+    .bubble:nth-child(1) {
+      left: 15%;
+      animation-duration: 7s;
+    }
+  
+    .bubble:nth-child(2) {
+      left: 40%;
+      animation-duration: 9s;
+    }
+  
+    .bubble:nth-child(3) {
+      left: 70%;
+      animation-duration: 8s;
+    }
+  }
+  
+  /* Further adjustments for small screens */
+  @media (max-width: 480px) {
+    .welcomeContainer {
+      padding: 30px; /* Reduced padding for very small screens */
+    }
+  
+    .welcomeContainer h1 {
+      font-size: 1.6rem; /* Smaller font for very small screens */
+    }
+  
+    .welcomeContainer h2 {
+      font-size: 1.2rem; /* Adjusted for small screens */
+    }
+  
+    .quoteContainer {
+      padding: 10px 15px; /* Further reduced padding */
+      font-size: 1rem; /* Slightly smaller font size */
+    }
+  
+    .bubble {
+      width: 50px;
+      height: 50px; /* Even smaller bubbles */
+    }
+  }
+  
+</style>

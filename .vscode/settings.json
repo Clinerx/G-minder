@@ -1,8 +1,0 @@
-{
-   "emmet.includeLanguages": {
-    "django-html": "html",
-    "html": "html"
-}
-
-    
-}

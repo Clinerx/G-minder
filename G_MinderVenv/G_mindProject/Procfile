@@ -1,1 +1,1 @@
-web: gunicorn g_mindproject.wsgi
+web: gunicorn G_mindProject.G_mindProject.wsgi
